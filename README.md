@@ -1,61 +1,100 @@
-Réalisé par : Français Maxence 
-Formation : LP DLWM
+# Jeu 2048 – Flutter
 
-Jeu 2048 - TP Flutter
+Le jeu 2048 en Flutter : faire glisser les tuiles, fusionner les nombres identiques et atteindre l'objectif. Trois modes de fusion, des objectifs de 256 à 8192, des grilles de 4 × 4 à 8 × 8, l'annulation des coups et des records par type de partie.
 
-Fonctionnalités principales :
-1. Déplacement des tuiles :
-   - Les tuiles peuvent être déplacées dans 4 directions : haut, bas, gauche, droite.
-   - Les tuiles identiques fusionnent lorsqu'elles se rencontrent.
-   - Un nouveau numéro (2 ou 4) apparaît aléatoirement après chaque mouvement.
-   - Les mouvements peuvent être effectués via :
-     - Gestes (swipe) sur l'écran.
-     - Touches directionnelles (clavier).
+C'était le TP Flutter du module Développement mobile, en licence professionnelle DLWM, rendu en décembre 2024. Il n'en restait que le code principal et l'écran des réglages, et plusieurs règles ne fonctionnaient pas : je l'ai repris en entier.
 
-2. Conditions de victoire et défaite :
-   - Victoire : Atteindre la valeur de l'objectif (par défaut : 2048).
-     - Option pour continuer à jouer après avoir atteint l'objectif.
-   - Défaite : Aucun mouvement disponible (grille pleine et aucune fusion possible).
+Le jeu se joue [dans le navigateur](https://miscuitatlas.github.io/jeu-2048-flutter/), au doigt ou au clavier (version web publiée sur GitHub Pages).
 
-3. Système de score :
-   - Score actuel : Somme de toutes les tuiles sur la grille.
-   - Meilleur score : Score le plus élevé atteint (sauvegardé via `SharedPreferences`).
+<table>
+  <tr>
+    <td><img src="docs/captures/partie.png" alt="Partie en cours en 4 × 4 avec le score, le record et le nombre de coups" width="260"></td>
+    <td><img src="docs/captures/victoire.png" alt="Objectif 2048 atteint, avec le choix de continuer ou de recommencer" width="260"></td>
+    <td><img src="docs/captures/grille-8x8.png" alt="Grille 8 × 8 en mode cascade, couleurs Océan et thème sombre" width="260"></td>
+  </tr>
+</table>
 
-4. Bouton pour les règles du jeu :
-   - Un bouton situé dans la barre d'application permet d'afficher les règles du jeu.
-   - Les règles expliquent les principes de base du jeu, ainsi que les options disponibles.
+## Les modes de fusion
 
-5. Retour en arrière :
-   - Un bouton permet d'annuler le dernier mouvement.
-   - Le bouton est situé en bas à gauche de l'écran.
+| Mode | Règle | Exemple vers la gauche |
+|---|---|---|
+| Classique | Les règles du 2048 original : une tuile ne fusionne qu'une fois par coup. | `2 2 2 2` → `4 4 0 0` |
+| Cascade | La variante de l'énoncé du TP : une tuile tout juste fusionnée peut fusionner à nouveau avec sa voisine. | `8 4 2 2` → `16 0 0 0` |
+| Express | Deux tuiles identiques donnent une tuile quatre fois plus grande, l'objectif arrive bien plus vite. | `2 2 0 0` → `8 0 0 0` |
 
-6. Recommencer une partie :
-   - Un bouton permet de réinitialiser la grille et de recommencer une nouvelle partie.
-   - Le bouton est situé en bas à droite de l'écran.
+Les exemples de l'énoncé servent de tests unitaires au mode cascade.
 
-Options de personnalisation (via GameSettingsScreen) :
-1. Objectif :
-   - Choisissez une valeur d'objectif parmi : 256, 512, 1024, 2048, 4096, ou 8192.
+## Fonctionnalités
 
-2. Palette de couleurs :
-   - Sélectionnez une palette de couleurs parmi "Default", "Blue", ou "Green".
+- Glissement sur la grille ou flèches du clavier (aussi ZQSD et WASD), annulation des 20 derniers coups.
+- Victoire dès que la tuile objectif apparaît, avec le choix de continuer ou de recommencer.
+- Records par type de partie (taille, objectif, mode) et reprise de la partie en cours au lancement suivant.
+- Réglages : objectif, taille de la grille, mode de fusion, grille de départ aléatoire, trois palettes de couleurs. Thème clair ou sombre selon l'appareil.
 
-3. Taille de la grille :
-   - Choisissez entre une grille classique 4x4 ou une grande grille 8x8.
+**Stack** : Flutter 3.50 et Dart 3.14, `CustomPainter` pour dessiner et animer la grille (demandé par l'énoncé), `shared_preferences` pour les réglages et les records, `flutter_test`.
 
-4. Grille aléatoire :
-   - Activez cette option pour commencer une partie avec une disposition aléatoire des tuiles.
+## Ce que j'ai corrigé
 
-5. Mode de fusion :
-   - "Classique" : Les tuiles identiques se combinent normalement.
-   - "Fusion Multiple" : Fusionnez 4 tuiles identiques adjacentes pour former une seule tuile.
-   - "Double Fusion" : Les tuiles identiques se combinent pour doubler leur fusion habituelle.
+- **Fusion** : les paires ne fusionnaient jamais, seuls quatre nombres identiques alignés se combinaient, et la partie se bloquait très vite. Le mode cascade de l'énoncé n'était pas implémenté.
+- **Victoire impossible** : en double fusion, les tuiles pouvaient sauter l'objectif (1024 + 1024 donnait 4096).
+- **Fonctions annoncées mais cassées** : le meilleur score était parfois remplacé par le nombre de coups, la grille aléatoire ne remplissait que les 16 premières cases en 8 × 8, et l'option « continuer après la victoire » n'existait pas.
+- **Gestes** : un glissement terminé doigt immobile était ignoré.
+- **Affichage** : les grands nombres débordaient des tuiles en 8 × 8. La taille du texte s'adapte maintenant à la tuile.
 
-6. Inversion des directions :
-   - Activez cette option pour inverser les directions haut/bas et gauche/droite.
+## Installation
 
-Éléments de l'interface utilisateur :
-- SplashScreen : Écran d'accueil affiché pendant 3 secondes avant d'accéder au jeu.
-- GameScreen : Écran principal où se déroule le jeu.
-- CustomPaint : Utilisé pour dessiner la grille et les tuiles.
-- Boutons flottants : Placés en bas à gauche et en bas à droite pour annuler ou recommencer.
+Prérequis : [Flutter](https://docs.flutter.dev/get-started/install) 3.50 ou plus récent.
+
+```bash
+git clone https://github.com/MiscuitAtlas/jeu-2048-flutter.git
+cd jeu-2048-flutter
+flutter pub get
+flutter run -d chrome        # ou -d windows, ou un téléphone Android branché
+```
+
+La version web publiée sur GitHub Pages se construit avec :
+
+```bash
+flutter build web --release --no-web-resources-cdn --base-href /jeu-2048-flutter/
+```
+
+Le moteur de rendu et la police sont inclus dans le site : le jeu ne fait aucune requête vers un site tiers.
+
+## Tests
+
+```bash
+flutter test
+flutter analyze
+```
+
+Une cinquantaine de tests unitaires et de widgets : fusion dans les trois modes, mouvements, victoire, annulation, records, et affichage en portrait, en paysage et avec un texte agrandi.
+
+## Structure
+
+```
+lib/game/       logique du jeu en Dart pur : fusion, grille, partie en cours, réglages
+lib/storage/    sauvegarde des réglages, des records et de la partie en cours
+lib/ui/         grille (CustomPainter et gestes), écrans, palettes de couleurs
+test/           tests de la fusion, de la grille, de la partie et de l'interface
+```
+
+## Limites
+
+- Les records sont enregistrés sur l'appareil (ou dans le navigateur) : il n'y a pas de classement partagé.
+- Deux exemples de l'énoncé s'arrêtent avant la dernière fusion (`8 0 0 8`). Le jeu applique la règle jusqu'au bout et donne 16 : sur ces deux cas, il ne suit donc pas l'énoncé à la lettre.
+## Ce que j'ai appris
+
+- **Séparer la logique de l'interface** : la grille est immuable et chaque mouvement renvoie une nouvelle grille. Les règles se testent sans écran, et annuler un coup revient à reprendre la grille précédente.
+- **Une seule fonction pour les quatre directions** : chaque ligne est lue dans le sens du mouvement, puis fusionnée vers son début. Les quatre directions et les trois modes passent par le même code, qu'il suffit de corriger une fois.
+- **Mesurer un geste sur toute sa durée** : se fier à la seule vitesse au moment où le doigt se lève faisait ignorer les glissements terminés doigt immobile. La distance parcourue compte maintenant aussi.
+
+## Crédits
+
+- Police [Rubik](https://github.com/googlefonts/rubik), sous licence SIL Open Font License (voir `assets/fonts/OFL.txt`).
+- Palette « Classique » reprise des couleurs du [2048 original](https://github.com/gabrielecirulli/2048) de Gabriele Cirulli.
+
+## Auteur
+
+Projet réalisé lors du TP Flutter du module Développement mobile, en licence professionnelle Développement Logiciel et Web Mobile (DLWM), puis retravaillé.
+
+**Maxence Français** : [portfolio](https://miscuitatlas.github.io) · [LinkedIn](https://www.linkedin.com/in/maxence-fran%C3%A7ais-a039a2307/)
