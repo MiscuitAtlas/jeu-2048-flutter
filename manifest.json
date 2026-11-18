@@ -1,0 +1,36 @@
+{
+    "name": "Jeu 2048",
+    "short_name": "2048",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#FAF6EF",
+    "theme_color": "#FAF6EF",
+    "description": "Jeu 2048 en Flutter : trois modes de fusion, objectifs de 256 à 8192, grilles de 4x4 à 8x8 et records.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "lang": "fr"
+}
